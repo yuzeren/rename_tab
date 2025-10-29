@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>标签页标题修改器</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 8px 12px;
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3367D6;
+    }
+    .status {
+      margin-top: 10px;
+      color: #4CAF50;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>修改当前标签页标题</h3>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="text" id="titleInput" placeholder="输入新的标题" style="flex: 1;">
+      <button id="changeTitle">确定</button>
+    </div>
+    <button id="restoreTitle" style="background-color: #757575; margin-top: 5px;">恢复默认标题</button>
+    
+    <h3>修改当前标签页图标</h3>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="text" id="faviconInput" placeholder="输入图标URL">
+    </div>
+    <div class="emoji-container" style="margin-top: 10px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px;">
+      <span class="emoji" data-emoji="😀">😀</span>
+      <span class="emoji" data-emoji="👍">👍</span>
+      <span class="emoji" data-emoji="❤️">❤️</span>
+      <span class="emoji" data-emoji="🌟">🌟</span>
+      <span class="emoji" data-emoji="🔥">🔥</span>
+      <span class="emoji" data-emoji="🎉">🎉</span>
+      <span class="emoji" data-emoji="🚀">🚀</span>
+      <span class="emoji" data-emoji="💡">💡</span>
+      <span class="emoji" data-emoji="📚">📚</span>
+      <span class="emoji" data-emoji="🎮">🎮</span>
+      <span class="emoji" data-emoji="🎵">🎵</span>
+      <span class="emoji" data-emoji="🍕">🍕</span>
+      <span class="emoji" data-emoji="🏆">🏆</span>
+      <span class="emoji" data-emoji="🌈">🌈</span>
+      <span class="emoji" data-emoji="🧠">🧠</span>
+      <span class="emoji" data-emoji="🔒">🔒</span>
+    </div>
+    <style>
+      .emoji {
+        font-size: 20px;
+        text-align: center;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+      }
+      .emoji:hover {
+        background-color: #f0f0f0;
+      }
+      .emoji.selected {
+        background-color: #e0e0e0;
+      }
+    </style>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <button id="changeFavicon" style="flex: 1;">修改图标</button>
+      <button id="restoreFavicon" style="flex: 1; background-color: #757575;">恢复默认图标</button>
+    </div>
+    
+    <div id="status" class="status">修改成功！</div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
