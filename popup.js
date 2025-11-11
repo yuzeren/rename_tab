@@ -86,10 +86,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 当用户点击修改图标按钮时
   changeFaviconButton.addEventListener('click', function() {
-    const faviconUrl = faviconInput.value.trim();
-    
-    // 使用URL或选中的emoji
-    if (faviconUrl || selectedEmoji) {
+    const inputValue = faviconInput.value.trim();
+
+    // 判定输入是否是URL（支持 http/https 以及 data:image）
+    const isLikelyUrl = (str) => {
+      if (!str) return false;
+      if (str.startsWith('data:image')) return true;
+      try {
+        const u = new URL(str);
+        return u.protocol === 'http:' || u.protocol === 'https:';
+      } catch (e) {
+        return false;
+      }
+    };
+
+    // 根据输入决定使用URL或emoji文本
+    let faviconUrl = '';
+    let emojiText = '';
+    if (isLikelyUrl(inputValue)) {
+      faviconUrl = inputValue;
+    } else if (inputValue) {
+      // 输入为非URL文本，按emoji处理（支持自定义emoji）
+      emojiText = inputValue;
+    } else if (selectedEmoji) {
+      emojiText = selectedEmoji;
+    }
+
+    // 使用URL或选中的/输入的emoji
+    if (faviconUrl || emojiText) {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const url = (tabs[0] && tabs[0].url) || '';
         if (
@@ -107,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chrome.scripting.executeScript({
           target: {tabId: tabs[0].id},
           func: changeTabFavicon,
-          args: [faviconUrl, selectedEmoji]
+          args: [faviconUrl, emojiText]
         });
         
         // 显示成功状态
