@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "标签页标题修改器",
   "version": "1.0",
-  "description": "修改当前标签页的标题",
+  "description": "修改当前标签页的标题，支持最近标签页切换",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -11,8 +11,20 @@
       "128": "images/icon128.svg"
     }
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
     "activeTab",
-    "scripting"
-  ]
+    "scripting",
+    "tabs"
+  ],
+  "commands": {
+    "switch-recent-tabs": {
+      "suggested_key": {
+        "default": "Alt+Q"
+      },
+      "description": "在最近使用的两个标签页之间切换"
+    }
+  }
 }
