@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "标签页标题修改器",
+  "name": "Tab PowerToy",
   "version": "1.0",
   "description": "修改当前标签页的标题，支持最近标签页切换",
   "action": {

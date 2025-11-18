@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const restoreFaviconButton = document.getElementById('restoreFavicon');
   const statusElement = document.getElementById('status');
   const emojiElements = document.querySelectorAll('.emoji');
+  const shortcutHintElement = document.getElementById('shortcutHint');
   
   let selectedEmoji = null;
 
@@ -61,14 +62,22 @@ document.addEventListener('DOMContentLoaded', function() {
           target: {tabId: tabs[0].id},
           func: changeTabTitle,
           args: [newTitle]
+        }).then(() => {
+          // 显示成功状态
+          statusElement.textContent = '标题已修改！';
+          statusElement.style.display = 'block';
+        }).catch(err => {
+          // 处理 ExtensionsSettings 等策略导致的注入失败
+          if (err.message.includes('ExtensionsSettings')) {
+            statusElement.textContent = '企业策略限制，无法在此页面执行脚本';
+          } else {
+            statusElement.textContent = '脚本注入失败：' + err.message;
+          }
+          statusElement.style.display = 'block';
+          statusElement.style.color = '#d93025';
+          // 防止未捕获异常继续冒泡
+          return;
         });
-        
-        // 显示成功状态
-        statusElement.textContent = '标题已修改！';
-        statusElement.style.display = 'block';
-        setTimeout(() => {
-          window.close(); // 2秒后关闭弹窗
-        }, 2000);
       });
     }
   });
@@ -132,14 +141,22 @@ document.addEventListener('DOMContentLoaded', function() {
           target: {tabId: tabs[0].id},
           func: changeTabFavicon,
           args: [faviconUrl, emojiText]
+        }).then(() => {
+          // 显示成功状态
+          statusElement.textContent = '图标已修改！';
+          statusElement.style.display = 'block';
+        }).catch(err => {
+          // 处理 ExtensionsSettings 等策略导致的注入失败
+          if (err.message.includes('ExtensionsSettings')) {
+            statusElement.textContent = '企业策略限制，无法在此页面执行脚本';
+          } else {
+            statusElement.textContent = '脚本注入失败：' + err.message;
+          }
+          statusElement.style.display = 'block';
+          statusElement.style.color = '#d93025';
+          // 防止未捕获异常继续冒泡
+          return;
         });
-        
-        // 显示成功状态
-        statusElement.textContent = '图标已修改！';
-        statusElement.style.display = 'block';
-        setTimeout(() => {
-          window.close(); // 2秒后关闭弹窗
-        }, 2000);
       });
     }
   });
@@ -177,14 +194,20 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.scripting.executeScript({
         target: {tabId: tabs[0].id},
         func: restoreDefaultTitle
+      }).then(() => {
+        // 显示成功状态
+        statusElement.textContent = '已恢复默认标题！';
+        statusElement.style.display = 'block';
+      }).catch(err => {
+        // 处理 ExtensionsSettings 等策略导致的注入失败
+        if (err.message.includes('ExtensionsSettings')) {
+          statusElement.textContent = '企业策略限制，无法在此页面执行脚本';
+        } else {
+          statusElement.textContent = '脚本注入失败：' + err.message;
+        }
+        statusElement.style.display = 'block';
+        statusElement.style.color = '#d93025';
       });
-      
-      // 显示成功状态
-      statusElement.textContent = '已恢复默认标题！';
-      statusElement.style.display = 'block';
-      setTimeout(() => {
-        window.close(); // 2秒后关闭弹窗
-      }, 2000);
     });
   });
 
@@ -207,19 +230,46 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.scripting.executeScript({
         target: {tabId: tabs[0].id},
         func: restoreDefaultFavicon
+      }).then(() => {
+        // 显示成功状态
+        statusElement.textContent = '已恢复默认图标！';
+        statusElement.style.display = 'block';
+      }).catch(err => {
+        // 处理 ExtensionsSettings 等策略导致的注入失败
+        if (err.message.includes('ExtensionsSettings')) {
+          statusElement.textContent = '企业策略限制，无法在此页面执行脚本';
+        } else {
+          statusElement.textContent = '脚本注入失败：' + err.message;
+        }
+        statusElement.style.display = 'block';
+        statusElement.style.color = '#d93025';
       });
-      
-      // 显示成功状态
-      statusElement.textContent = '已恢复默认图标！';
-      statusElement.style.display = 'block';
-      setTimeout(() => {
-        window.close(); // 2秒后关闭弹窗
-      }, 2000);
     });
   });
 
   // 自动聚焦到标题输入框
   titleInput.focus();
+
+  // 显示快捷键提示
+  const showShortcutHint = (key) => {
+    if (!shortcutHintElement) return;
+    shortcutHintElement.textContent = `最近标签页切换快捷键：${key}（可在扩展快捷键中更改）`;
+    shortcutHintElement.style.display = 'block';
+  };
+
+  if (typeof chrome !== 'undefined' && chrome.commands && typeof chrome.commands.getAll === 'function') {
+    try {
+      chrome.commands.getAll((commands) => {
+        const cmd = (commands || []).find(c => c.name === 'switch-recent-tabs');
+        const key = (cmd && cmd.shortcut) ? cmd.shortcut : 'Alt+Q';
+        showShortcutHint(key);
+      });
+    } catch (e) {
+      showShortcutHint('Alt+Q');
+    }
+  } else {
+    showShortcutHint('Alt+Q');
+  }
 });
 
 // 在标签页中执行的函数 - 修改标题
