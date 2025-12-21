@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Tab PowerToy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --accent: #FFE135;
@@ -12,28 +13,79 @@
       --secondary-hover-bg: #E8F5E9;
       --secondary-text: #2E7D32;
       --secondary-border: #E0E0E0;
+      
+      /* Light Mode Defaults */
+      --bg-color: #FFFFFF;
+      --text-color: #333333;
+      --heading-color: var(--accent-contrast);
+      --input-bg: #FFFFFF;
+      --input-border: #ccc;
+      --input-text: #333333;
+      --footer-hint-color: #666;
+      --footer-border-color: #eee;
+      --status-color: #4CAF50;
+      --emoji-hover: #f0f0f0;
+      --emoji-selected: #e0e0e0;
+      --subtext-color: #888;
+      --divider-color: #eee;
     }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #202124;
+        --text-color: #e8eaed;
+        --heading-color: #FFE135;
+        --input-bg: #2d2d2d;
+        --input-border: #5f6368;
+        --input-text: #e8eaed;
+        --footer-hint-color: #9aa0a6;
+        --footer-border-color: #3c4043;
+        --status-color: #81c995;
+        --emoji-hover: #3c4043;
+        --emoji-selected: #4d4d4d;
+        --subtext-color: #9aa0a6;
+        --divider-color: #3c4043;
+        
+        --secondary-bg: #2d2d2d;
+        --secondary-hover-bg: #3c4043;
+        --secondary-text: #81c995;
+        --secondary-border: #5f6368;
+      }
+    }
+
     body {
       width: 300px;
       padding: 15px;
       font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
     .container {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
+    h1 {
+      color: var(--heading-color) !important;
+    }
     input {
       padding: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--input-border);
       border-radius: 4px;
       width: 100%;
       box-sizing: border-box;
       outline: none;
       transition: border-color 0.2s;
+      background-color: var(--input-bg);
+      color: var(--input-text);
     }
     input:focus {
       border-color: var(--accent-contrast);
+    }
+    @media (prefers-color-scheme: dark) {
+      input:focus {
+        border-color: var(--accent);
+      }
     }
     button {
       padding: 8px 12px;
@@ -58,22 +110,65 @@
     }
     .status {
       margin-top: 10px;
-      color: #4CAF50;
+      color: var(--status-color);
       display: none;
+    }
+    .status.error {
+      color: #d93025;
+    }
+    .status.info {
+      color: var(--subtext-color);
+    }
+    @media (prefers-color-scheme: dark) {
+      .status.error {
+        color: #f28b82;
+      }
     }
     .footer-hint {
       margin-top: 12px;
       font-size: 12px;
-      color: #666;
-      border-top: 1px solid #eee;
+      color: var(--footer-hint-color);
+      border-top: 1px solid var(--footer-border-color);
       padding-top: 8px;
       display: none;
+    }
+    
+    .emoji {
+      font-size: 20px;
+      text-align: center;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .emoji:hover {
+      background-color: var(--emoji-hover);
+    }
+    .emoji.selected {
+      background-color: var(--emoji-selected);
+    }
+    
+    .launcher-section {
+      margin-top: 20px;
+      border-top: 1px solid var(--divider-color);
+      padding-top: 15px;
+    }
+    .launcher-label {
+      font-size: 14px;
+      color: var(--text-color);
+      cursor: pointer;
+      user-select: none;
+    }
+    .launcher-hint {
+      font-size: 12px;
+      color: var(--subtext-color);
+      margin-top: 4px;
+      margin-left: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align: center; margin: 0 0 15px 0; font-size: 22px; color: var(--accent-contrast); font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive; font-weight: bold; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">Tab PowerToy</h1>
+    <h1 style="text-align: center; margin: 0 0 15px 0; font-size: 24px; font-family: 'Nunito', sans-serif; font-weight: 700; letter-spacing: 0.3px;">Tab PowerToy</h1>
     <h3>修改当前标签页标题</h3>
     <div style="display: flex; gap: 10px; align-items: center;">
       <input type="text" id="titleInput" placeholder="输入新的标题" style="flex: 1;">
@@ -104,22 +199,24 @@
       <span class="emoji" data-emoji="🧠">🧠</span>
       <span class="emoji" data-emoji="🔒">🔒</span>
     </div>
-    <style>
-      .emoji {
-        font-size: 20px;
-        text-align: center;
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-      }
-      .emoji:hover {
-        background-color: #f0f0f0;
-      }
-      .emoji.selected {
-        background-color: #e0e0e0;
-      }
-    </style>
+
     <button id="restoreFavicon" style="margin-top: 5px;">恢复默认图标</button>
+
+    <div class="launcher-section">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="launcherMode" style="width: auto; margin: 0;">
+        <label for="launcherMode" class="launcher-label">Launcher 模式 (面板常驻)</label>
+      </div>
+      <div class="launcher-hint">
+        开启后面板不会随按键松开而关闭，需点击或按 ESC 关闭
+      </div>
+    </div>
+
+    <div id="debugSection" style="display: none;">
+      <h3>调试工具</h3>
+      <button id="debugOpenPanel" style="margin-top: 5px; width: 100%; background-color: #607D8B; color: white;">打开切换面板 (Debug)</button>
+      <button id="copyDebugLogs" style="margin-top: 5px; width: 100%; background-color: #795548; color: white;">复制调试日志</button>
+    </div>
 
     <div id="status" class="status">修改成功！</div>
     <div id="shortcutHint" class="footer-hint"></div>

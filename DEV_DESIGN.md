@@ -85,6 +85,43 @@ rename_tab/
   5. 执行标题修改逻辑
   6. 显示成功状态并自动关闭
 
+### 2.6 标签页切换模块 (Switcher)
+- **架构**：Client-Server 模型
+  - **Server (background.js)**: 维护全局状态 (Session)、处理快捷键命令、管理 MRU 历史记录、分发数据。
+  - **Client (switcher.js)**: 注入到每个页面的 Content Script，负责 UI 渲染和用户交互。
+
+- **状态管理 (switchingSession)**：
+  - `isActive`: 会话是否激活
+  - `currentTabId`: 当前 Tab ID
+  - `targetIndex`: 目标 Tab 索引
+  - `logBuffer`: 调试日志缓冲区
+  - `cachedTabs`: 缓存的 Tab 列表数据 (Promise)
+
+- **UI 实现 (Shadow DOM)**：
+  - 使用 `attachShadow({ mode: 'closed' })` 创建隔离环境。
+  - CSS 直接注入 Shadow Root (`<style>` 标签)，避免外部样式污染。
+  - 使用 `DocumentFragment` 批量构建 DOM，提高渲染性能。
+  - 列表项包含：Favicon、标题、URL、分组胶囊 (Badge)。
+  - **Favicon 容错**：优先使用 `tab.favIconUrl`，若为空或加载失败（触发 `onerror`），自动回退显示默认的 📄 Emoji SVG。
+
+- **交互逻辑**：
+  - **快捷键**：`chrome.commands.onCommand` 触发会话开始或索引切换。
+  - **修饰键释放**：Content Script 监听 `keyup` (Capture 模式) 事件，检测 Alt/Ctrl/Meta 释放，发送 `alt_released` 消息给 Background 执行切换。
+  - **焦点管理**：面板打开时强制 `panel.focus()`，确保键盘事件不丢失。
+  - **搜索交互**：
+    - 监听 `/` 键：激活搜索框并聚焦。
+    - 监听 `ESC` 键：若搜索框聚焦则 `blur()`，否则隐藏面板。
+    - 搜索框样式：使用 `padding-left` 预留提示符空间，提示符使用绝对定位。
+  - **平台适配**：Content Script 检测 `navigator.platform`，Background 获取真实快捷键配置，共同决定 UI 提示文案。
+
+- **通信协议**：
+  - `show_panel`: Background -> Content (显示面板，传递 tabs 数据)
+  - `hide_panel`: Background -> Content (隐藏面板)
+  - `update_selection`: Background -> Content (更新选中项)
+  - `alt_released`: Content -> Background (修饰键松开，请求切换)
+  - `switch_to_tab`: Content -> Background (鼠标点击切换)
+  - `log_from_content`: Content -> Background (日志上报)
+
 ## 3. 关键算法与实现
 
 ### 3.1 标题修改实现
